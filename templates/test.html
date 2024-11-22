@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>test</title>
+{% endblock %}
+
+{% block body %}
+<div id="asl"></div>
+<script>
+var source = "Here's a simple Python code that prints the first 10 numbers in the Fibonacci sequence: \n ``` def fibonacci(n): fib_sequence = [0, 1] while len(fib_sequence) < n: fib_sequence.append(fib_sequence[-1] + fib_sequence[-2]) return fib_sequence print(fibonacci(10)) ``` Would you like me to run the code for you? ";
+var body = document.getElementById("asl");
+
+body.innerHTML = marked.parse(source);
+</script>
+
+{% endblock %}

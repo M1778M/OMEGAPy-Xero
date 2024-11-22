@@ -1,0 +1,13 @@
+[Windows-Packages]
+ffmpeg # choco install for windows
+
+[python-libraries]
+windowsapps
+pyautogui
+winapps
+pywin32
+cython
+pyttsx3
+gtts
+playsound
+pydub
