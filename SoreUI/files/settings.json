@@ -1,0 +1,33 @@
+{
+    "General": {
+      "BackgroundImage": "",
+      "MainButtonBackgroundImage": "",
+      "PrimaryColor": "#FFFFFF",
+      "SecondaryColor": "#000000",
+      "FixedSize": {"Width": 800, "Height": 600},
+      "AdditionalCss": ""
+    },
+    "API Settings": {
+      "SelectedAPI": "API 1",
+      "ApiKey": "",
+      "TrainFormat": "Default",
+      "AdditionalCommand": "",
+      "Libraries": []
+    },
+    "Security": {
+      "SecurityMethod": "Password",
+      "Password": "",
+      "FaceLock": {"Enabled": false, "FaceData": ""}
+    },
+    "Chat Settings": {
+      "PrimaryColor": "#FF5733",
+      "SecondaryColor": "#33FF57",
+      "Font": "Arial",
+      "AdditionalCss": ""
+    },
+    "About Us": {
+      "Text": "About this application...",
+      "SocialMediaLinks": []
+    }
+  }
+  

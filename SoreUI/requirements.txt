@@ -1,0 +1,7 @@
+pyqt6
+markdown
+pyaudio
+difflib
+pyttsx3
+numpy
+speech_recognition

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Noto Sans</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>OMEGAPy-SoreUI</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">	* {
+    color: #e0e5ec;
+border-color:#9461fd;
+
+}
+ QWidget{
+background-repeat: no-repeat;
+	display:inline-block;
+	-neon: #9461fd;
+  	-neon-glow: #4003e6;
+	background-image: url(:/Backgroundimgs/data/darkpurplebackblured.png);
+}
+QTextBrowser{background:none}
+QPushButton {    
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 15px;
+    background-color: rgba(0,0,0,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(30px);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: none;
+}
+QPushButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+QPushButton:before {
+  background: none;
+  border: 4px solid #fff;
+  content: &quot;&quot;;
+  display: block;
+  position: absolute;
+  pointer-events: none;
+}
+
+QPushButton:after{
+content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.6;
+  box-shadow: 0 0 1em 0.5em var(--purple-300);
+}
+
+QLabel {
+	background:transparent;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="pushtotalk">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>90</y>
+      <width>250</width>
+      <height>250</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border-radius: 125%;
+   border-width: 5px;
+position:relative;
+z-index:1;
+    border-style: solid;
+    border-color:#9461fd;
+ box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+filter:drop-shadow(0 0 1rem #9461fd);
+    subcontrol-position: right center;
+    subcontrol-origin: padding;
+}
+QPushButton:before{
+background: none;
+  border: 4px solid #fff;
+  content: &quot;&quot;;
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  pointer-events: none;}
+
+QPushButton:after{
+content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.6;
+  box-shadow: 0 0 1em 0.5em var(--purple-300);
+}
+</string>
+    </property>
+    <property name="text">
+     <string>PRESS TO TALK</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textresponse">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>370</y>
+      <width>350</width>
+      <height>250</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QTextBrowser{background:rgba(0,0,0,0);}</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="switchtotextmodebtn">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>650</y>
+      <width>171</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Switch to text</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="credits">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>720</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string>Made by M1778</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

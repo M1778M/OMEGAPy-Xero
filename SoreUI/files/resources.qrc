@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="Backgroundimgs">
+    <file>data/neonpurple.png</file>
+    <file>data/darkpurplebackblured.png</file>
+    <file>data/darkpurpleback.jpg</file>
+  </qresource>
+</RCC>

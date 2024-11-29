@@ -1,0 +1,31 @@
+SoreUI a powerful platform to maintain both stability and activity.
+
+SoreUI provides VALID DATA FORMAT, which is a popular Standard in OMEGAPy-XLang-Licensing.
+
+SoreUI supports as much languages, cultures, formats, standards,... as possible.
+
+SoreUI Platform Goals:
+	- User friendly Graphical Interface
+	- User friendly activity/functionality
+	- Peak Performance
+	- Multiple API supports and integrations
+	- Support for local usage of AI models and other things
+	- At last a great new experience for user + enjoyment
+
+
+SoreUI Plans(Admin Only):
+	
+files/settings(SettingWindow) -> Able to choose custom Speech2Text API/Local
+files/settings(SettingWindow) -> Add Download Manager for Local models
+files/settings(SettingWindow) -> Manage customization for style config
+files/main(MainWindow) -> Add settings button
+files/main(MainWindow) -> customize styles and load from config
+files/main(MainWindow) -> Add snow in background random (ChatGPT)
+files/main(MainWindow) -> Betterize font, buttons, graph, credits, performance
+files/chat(ChatWindow) -> Betterize/fix input/outputs
+files/chat(ChatWindow)+files/main(MainWindow) -> Sync API usage for LLM model in {CUSTOM_NAME}
+files/chat(ChatWindow) -> Read style config and load FROM {files/settings(func=functionality)
+files/login(LoginWindow) -> Sync with {files/settings(ALL_CONFIGS)}
+files/settings(SettingWindow) -> Add a button to when choose API load(files/login(LoginWindow))
+files/main(MainWindow)+files/chat(ChatWindow) -> Sync()-> Connect(Database)/Database
+files/main(MainWindow) -> Add toast
