@@ -1,0 +1,71 @@
+General:
+	Background-image -> file choice
+	Main-Button-image -> file choice
+	Primary-Color -> color choice
+	Secondary-Color -> color choice
+	Text-Color -> color choice
+	Font: font choice
+	Window-Size -> int_input(x),int_input(y) # DEFAULT BY MATH CALCULATING SCREEN SIZE
+Chat:
+	Primary-Color -> color choice
+	Secondary-Color -> color choice
+	Font: font choice
+	Additional-Css -> css_code()
+API:
+	$Platform(Local or API, VARIABALES_REQUIRED=());
+	Select-Platform -> MULTI_CHOICE({MultiPlatform:{SELECT_LIST(PLATFORMS),LOGIN_FOR_EACH_PLATFORM},
+					OPENAI:Platform(API,api_key),
+					GROQ:Platform(API,api_key),
+					TOGETHER:Platform(API,api_key),
+					CLOUDFLARE:Platform(API,accound_id:String,api_key),
+					AVIANAI:Platform(API,api_key),
+					COHERE:Platform(API,api_key),
+					MISTRAL:Platform(API,api_key),
+					OPENROUTER:Platform(API,api_key),
+					GOOGLEGEMINI:Platform(API,api_key)
+			})
+	@IF(Select-Platform == MultiPlatform) @THEN
+		@FOREACH PLATFORM @IN SELECTED_LIST(PLATFORMS_SELECTED_LIST)
+			OMGLIB.LLM.PLT_HANDLER<<LOGIN_PLATFORM(PLATFORM)
+			OMGLIB.LLM.MODEL_HANDLER<<SELECT_MODEL(PLATFORM)
+		Role-Command -> combo box $(OMGX.COMMANDS_NAME)
+	@ELSE
+		@FOREACH VARIABLE @IN SELECTED_PLATFORM(PLATFORM)
+			$(VARIABLE.VARIABLE_NAME) -> input box
+			SEND_VARIABLES(OMGLIB.CONFIG.VARIABLE_HANDLER)
+		Role-Command -> combo box $(OMGX.COMMANDS_NAME)
+
+Text2Speech:
+	$Platform(Local or API,VARIABLES_REQUIRED);
+	Select-Platform -> MULTI_CHOICE({SimpleTTS:Platform(Local),
+					GTTS:Platform(API),
+					MURFAI:Platform(API,api_key),
+					PLAYHT:Platform(API,USERID:String,SECRETKEY:String)})
+	Language -> ComboBox
+	@IF (@HAS($SELECTED_PLATFORM, VARIABLES_REQUIRED)) @THEN
+		Api-Key -> input box
+
+Speech2Text:
+	$Platform(Local or API, VARIABLES_REQUIRED);
+	Select-Platform -> MULTI_CHOICE({VOSK:Platform(Local,Language:String,MSize:VOSK_SIZE),# If a model is not installed and settings are saved it will be installed automatically
+					WHISPER:Platform(Local,Model:WModels),
+					WIT:Platform(API,api_key,Language:String),
+					VOSKAPI:Platform(API,Language:String),
+					GOOGLE:Platform(API,Language:String),
+					SPHINX:Platform(API,Language:String),
+					CLOUDFLARE:Platform(API,account_id:String,api_key)
+					})
+	@IF (@HAS($SELECTED_PLATFORM, VARIABLES_REQUIRED)) @THEN
+		Info-Selected -> SMART_S2T_LOGIN($SELECTED_PLATFORM)
+		
+
+Security:
+	Security-Method -> MULTI_CHOICE({Passowrd:{INPUT_BOX},
+					FaceLock:{FACE_ANALYZE_BUTTON,FACE_CHECK_BUTTON})
+About:
+	...
+
+Plugins:
+	Install-New -> Select File (zip)
+	Plugin-List -> LIST(PLUGINS) OPTIONS {REMOVE_PLUGIN, RESTART_PLUGIN}
+
