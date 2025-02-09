@@ -1,33 +1,64 @@
 {
-    "General": {
-      "BackgroundImage": "",
-      "MainButtonBackgroundImage": "",
-      "PrimaryColor": "#FFFFFF",
-      "SecondaryColor": "#000000",
-      "FixedSize": {"Width": 800, "Height": 600},
-      "AdditionalCss": ""
-    },
-    "API Settings": {
-      "SelectedAPI": "API 1",
-      "ApiKey": "",
-      "TrainFormat": "Default",
-      "AdditionalCommand": "",
-      "Libraries": []
-    },
-    "Security": {
-      "SecurityMethod": "Password",
-      "Password": "",
-      "FaceLock": {"Enabled": false, "FaceData": ""}
-    },
-    "Chat Settings": {
-      "PrimaryColor": "#FF5733",
-      "SecondaryColor": "#33FF57",
-      "Font": "Arial",
-      "AdditionalCss": ""
-    },
-    "About Us": {
-      "Text": "About this application...",
-      "SocialMediaLinks": []
-    }
-  }
-  
+	"General": {
+		"BackgroundImage": "DEFAULT",
+		"MainButtonBackgroundImage": "DEFAULT",
+		"PrimaryColor": "#9461fd",
+		"SecondaryColor": "#2d2d2d",
+		"TextColor": "#e0e5ec",
+		"Font": "Segoe UI",
+		"WindowSize": {
+			"Width": 0,
+			"Height": 0
+		}
+	},
+	"Chat": {
+		"PrimaryColor": "#FF5733",
+		"SecondaryColor": "#33FF57",
+		"Font": "Arial",
+		"AdditionalCss": ""
+	},
+	"API": {
+		"Platform": "MultiPlatform",
+		"If": {
+			"MultiPlatform": {
+				"SelectedPlatforms": []
+			},
+			"SinglePlatform": {}
+		},
+		"RoleCommand": "BasicChatBot"
+	},
+	"Text2Speech": {
+		"Platform": "GTTS",
+		"PlatformVariables": {
+			"API_KEY": "",
+			"USERID": "",
+			"SECRETKEY": ""
+		},
+		"Language": "en"
+	},
+	"Speech2Text": {
+		"Platform": "GOOGLE",
+		"PlatformVariables": {
+			"Language": "en",
+			"MSize": "small",
+			"WModel": "base",
+			"API_KEY": "",
+			"ACCOUNT_ID": ""
+		}
+	},
+	"Security": {
+		"Enabled": false,
+		"SecurityMethod": "Password",
+		"SecurityVariables": {
+			"InsecurePassword": "password"
+		}
+	},
+	"Plugins": {
+		"InstalledPlugins": [{
+			"PluginName": "Default",
+			"PluginFolderPath": "/plugins/defaultplugin",
+			"PluginInstallScript": "/plugins/defaultplugin/install.py",
+			"PluginActivateScript": "/plugins/defaultplugin/run.py"
+		}]
+	}
+}   

@@ -5,220 +5,210 @@ import sys
 import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
 
+class ChatMessageWidget(QTextBrowser):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setOpenLinks(False)
+        self.setMinimumWidth(600)
+        self.setMaximumWidth(600)
+        self.document().setDocumentMargin(10)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
 class ChatWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setup_ui()
+        self.setup_styles()
+        self.setup_connections()
+        self.loading_state = 0
+        self.is_loading = False
+        self._main_window = None
 
-        # Window setup
-        self.setWindowTitle("OMEGAPy-Xero Chatmode")
-        self.setFixedSize(400, 600)
+    def setup_ui(self):
+        self.setWindowTitle("OMEGAPy-Xero Chat")
+        self.resize(800, 600)
+        self.setMinimumSize(400, 400)
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(15)
+
+        # Chat history
+        self.chat_scroll = QScrollArea()
+        self.chat_scroll.setWidgetResizable(True)
+        self.chat_container = QWidget()
+        self.chat_layout = QVBoxLayout(self.chat_container)
+        self.chat_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.chat_layout.setContentsMargins(0, 0, 10, 0)
+        self.chat_layout.setSpacing(15)
+        self.chat_scroll.setWidget(self.chat_container)
+        main_layout.addWidget(self.chat_scroll)
+
+        # Input area
+        input_container = QWidget()
+        input_container.setMaximumHeight(100)
+        input_layout = QHBoxLayout(input_container)
+        input_layout.setContentsMargins(0, 0, 0, 0)
+        input_layout.setSpacing(10)
+        
+
+        self.input_field = QTextEdit()
+        self.input_field.setPlaceholderText("Type your message...")
+        self.input_field.setMinimumHeight(60)
+        input_layout.addWidget(self.input_field, 1)
+
+        self.send_button = QPushButton("Send")
+        self.send_button.setFixedSize(80, 60)
+        input_layout.addWidget(self.send_button)
+
+        main_layout.addWidget(input_container)
+
+        # Loading indicator
+        self.loading_indicator = QLabel()
+        self.loading_indicator.hide()
+        main_layout.addWidget(self.loading_indicator)
+
+        # Scroll timer
+        self.scroll_timer = QTimer()
+        self.scroll_timer.setInterval(100)
+        self.scroll_timer.timeout.connect(self.ensure_scroll)
+        QShortcut(QKeySequence(Qt.Key.Key_Down), self, self.ensure_scroll)
+        QShortcut(QKeySequence("Ctrl+X"), self, self.clear_chat)
+        
+        
+
+    def setup_styles(self):
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #2a2a2a;
+                background-color: #1a1a1a;
             }
-        """)
-        self._main_window = None
-        # Central widget and layout
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        layout = QVBoxLayout(self.central_widget)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(15)
-
-        # Chat display
-        self.chat_display = QTextBrowser()
-        self.chat_display.setStyleSheet("""
-            QTextBrowser {
-                background-color: #1e1e1e;
-                color: #ffffff;
-                font-family: 'Arial', sans-serif;
-                font-size: 14px;
-                border: 2px solid #00d1ff;
-                border-radius: 10px;
-                padding: 10px;
-                white-space: pre-wrap;  /* Ensures formatting like code blocks are preserved */
+            QScrollArea {
+                border: none;
+                background-color: #1a1a1a;
             }
-        """)
-        layout.addWidget(self.chat_display)
-
-        # Input field (multi-line)
-        self.input_field = QTextEdit()
-        self.input_field.setPlaceholderText("Type your message here...")
-        self.input_field.setStyleSheet("""
             QTextEdit {
-                background-color: #1e1e1e;
-                color: #00d1ff;
-                font-family: 'Arial', sans-serif;
+                background-color: #2d2d2d;
+                color: #ffffff;
+                border: 2px solid #3d3d3d;
+                border-radius: 8px;
+                padding: 1px;
+                font-family: 'Segoe UI';
                 font-size: 14px;
-                border: 2px solid #00d1ff;
-                border-radius: 10px;
-                padding: 8px 10px;
+                selection-background-color: #3a6da4;
             }
-            QTextEdit:focus {
-                border-color: #007acc;
-            }
-        """)
-        self.input_field.setFixedHeight(60)
-        self.input_field.installEventFilter(self)  # Install an event filter for key handling
-        layout.addWidget(self.input_field)
-
-        # Send button
-        self.send_button = QPushButton("Send")
-        self.send_button.setStyleSheet("""
             QPushButton {
-                background-color: #1e1e1e;
-                color: #00d1ff;
-                font-family: 'Arial', sans-serif;
+                background-color: #2d2d2d;
+                color: #ffffff;
+                border: 2px solid #3d3d3d;
+                border-radius: 8px;
+                padding: 8px 16px;
+                font-family: 'Segoe UI';
                 font-size: 14px;
-                border: 2px solid #00d1ff;
-                border-radius: 10px;
-                padding: 8px 15px;
             }
             QPushButton:hover {
-                background-color: #007acc;
+                background-color: #3d3d3d;
+                border-color: #4d4d4d;
             }
             QPushButton:pressed {
-                background-color: #004e99;
+                background-color: #2d2d2d;
             }
         """)
-        self.send_button.clicked.connect(self.handle_message)
-        layout.addWidget(self.send_button)
 
-        # Smooth glowing effect
-        self.add_glow_effect(self.input_field, QColor(0, 209, 255), 25)
-        self.add_glow_effect(self.send_button, QColor(0, 209, 255), 15)
+        self.loading_indicator.setStyleSheet("""
+            QLabel {
+                color: #4d4d4d;
+                font-family: 'Segoe UI';
+                font-size: 12px;
+                qproperty-alignment: AlignCenter;
+            }
+        """)
 
-        # Loading animation variables
+    def setup_connections(self):
+        self.send_button.clicked.connect(self.send_message)
+        self.input_field.installEventFilter(self)
         self.loading_timer = QTimer()
-        self.loading_timer.timeout.connect(self.update_loading_message)
-        self.loading_state = 0
-        self.is_loading = False
+        self.loading_timer.timeout.connect(self.update_loading)
 
     def eventFilter(self, obj, event):
-        """Handle custom key press events for the input field."""
         if obj == self.input_field and event.type() == QEvent.Type.KeyPress:
-            if event.key() == Qt.Key.Key_Return:
-                if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
-                    # Shift+Enter: Add a new line
-                    cursor = self.input_field.textCursor()
-                    cursor.insertText("\n")
-                    return True
-                else:
-                    # Enter: Send the message
-                    self.handle_message()
-                    return True
+            if event.key() == Qt.Key.Key_Return and not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+                self.send_message()
+                return True
         return super().eventFilter(obj, event)
 
-    def load_messages(self, message_list):
-        """Load the message list and display them."""
-        self.chat_display.clear()  # Clear existing messages
-        for message in message_list:
-            role = "You" if message["role"] == "user" else "Bot"
-            self.add_message(role, message["content"])
+    def create_message_bubble(self, message, is_user=False):
+        bubble = ChatMessageWidget()
+        bubble.setHtml(self.format_message(message, is_user))
+        bubble.setStyleSheet(f"""
+            QTextBrowser {{
+                background-color: {'#2d5a7c' if is_user else '#2d2d2d'};
+                color: #ffffff;
+                border-radius: 12px;
+                border: 1px solid {'#3a6da4' if is_user else '#3d3d3d'};
+            }}
+        """)
+        return bubble
 
-    def handle_message(self):
-        """Handle the user input and simulate a bot response with a delay."""
-        user_message = self.input_field.toPlainText().strip()
-        if user_message:
-            # Add user message to the display
-            self.add_message("user", user_message)
-            self.input_field.clear()
+    def format_message(self, text, is_user=False):
+        if not is_user:
+            text = markdown.markdown(text, extensions=[CodeHiliteExtension(noclasses=True)])
+        return f"""
+            <div style="font-family: 'Segoe UI'; font-size: 14px; line-height: 1.4;">
+                {text}
+            </div>
+        """
 
-            # Start loading animation
-            self.start_loading()
+    def send_message(self):
+        message = self.input_field.toPlainText().strip()
+        if not message:
+            return
 
-            # Simulate bot response after a delay
-            QTimer.singleShot(3000, lambda: self.finish_loading(self.get_bot_response(user_message)))
+        self.input_field.clear()
+        self.add_message(message, is_user=True)
+        self.start_loading()
+        QTimer.singleShot(1500, lambda: self.receive_message("Here's a sample response with **Markdown** and `code`."))
 
-    def get_bot_response(self, message: str) -> str:
-        """Mock bot response logic with Markdown and code syntax."""
-        responses = {
-            "hello": "Hi there! How can I assist you today?\n\n**Here's some Markdown**:\n\n- **Bold** text\n- *Italic* text\n\n```python\n# Here's some Python code\nprint('Hello, World!')\n```",
-            "bye": "Goodbye! Have a great day!",
-            "thanks": "You're welcome!"
-        }
-        return responses.get(message.lower(), "I'm sorry, I don't understand that.")
-
-    def markdown_to_html(self, markdown_text):
-        """Convert Markdown to HTML and highlight code."""
-        # Use the markdown library to convert the Markdown to HTML
-        extensions = [CodeHiliteExtension(linenums=True)]
-        html = markdown.markdown(markdown_text, extensions=extensions)
-
-        # Return the HTML formatted response with proper code block wrapping
-        return f'<div style="color: #ffffff; font-size: 14px;">{html}</div>'
-
-    def add_glow_effect(self, widget, color, blur_radius):
-        """Add a glowing effect to a widget."""
-        glow = QGraphicsDropShadowEffect()
-        glow.setBlurRadius(blur_radius)
-        glow.setColor(color)
-        glow.setOffset(0, 0)
-        widget.setGraphicsEffect(glow)
-
-    def add_message(self, role: str, content: str):
-        """Add a single message to the chat display with proper formatting."""
-        if role == "assistant":
-            # Render the bot message as HTML (with Markdown formatting)
-            formatted_message = f'<p style="color:#00d1ff; font-weight:bold;">Bot:</p><p>{self.markdown_to_html(content)}</p>'
-        elif role == "user":
-            formatted_message = f'<p style="color:#ffffff; font-weight:bold;">You:</p><p>{content}</p>'
-        else:
-            formatted_message = f'<p style="color:#808080;">{role}:</p><p>{content}</p>'
-
-        self.chat_display.append(formatted_message)
+    def add_message(self, message, is_user=False):
+        bubble = self.create_message_bubble(message, is_user)
+        self.chat_layout.addWidget(bubble, alignment=Qt.AlignmentFlag.AlignRight if is_user else Qt.AlignmentFlag.AlignLeft)
+        self.scroll_timer.start()
+    
+    def ensure_scroll(self):
+        self.chat_scroll.verticalScrollBar().setValue(
+            self.chat_scroll.verticalScrollBar().maximum()
+        )
+        self.scroll_timer.stop()
 
     def start_loading(self):
-        """Start the loading animation."""
         self.is_loading = True
-        self.loading_state = 0
-
-        # Add a single placeholder line if none exists yet
-        if not self.chat_display.toPlainText().endswith("Bot: "):
-            self.add_message("Bot", "")  # Placeholder
         self.loading_timer.start(500)
+        self.loading_indicator.show()
 
-    def update_loading_message(self):
-        """Update the loading animation inline with dots."""
-        if self.is_loading:
-            self.loading_state = (self.loading_state + 1) % 4
-            dots = "." * self.loading_state
+    def update_loading(self):
+        self.loading_state = (self.loading_state + 1) % 4
+        dots = "." * self.loading_state
+        self.loading_indicator.setText(f"Bot is thinking{dots}")
 
-            # Move cursor to last line and update with dots
-            cursor = self.chat_display.textCursor()
-            cursor.movePosition(cursor.MoveOperation.End)
-            cursor.movePosition(cursor.MoveOperation.StartOfBlock, cursor.MoveMode.KeepAnchor)
-            cursor.insertText(f"Thinking{dots}", self.chat_display.currentCharFormat())
-
-    def finish_loading(self, bot_response: str):
-        """Stop the loading animation and replace the placeholder with the actual response."""
+    def receive_message(self, message):
         self.is_loading = False
         self.loading_timer.stop()
+        self.loading_indicator.hide()
+        self.add_message(message, is_user=False)
+    def clear_chat(self):
+        for i in reversed(range(self.chat_layout.count())):
+            self.chat_layout.itemAt(i).widget().deleteLater()
 
-        # Replace the last "Bot: " placeholder with the actual response
-        cursor = self.chat_display.textCursor()
-        cursor.movePosition(cursor.MoveOperation.End)
-        cursor.movePosition(cursor.MoveOperation.StartOfBlock, cursor.MoveMode.KeepAnchor)
-        cursor.insertText(f"{bot_response}", self.chat_display.currentCharFormat())
     def closeEvent(self, event):
-        if self._main_window == None:
-            event.accept()
-        else:
+        if self._main_window:
             self._main_window.setDisabled(False)
             self._main_window.setHidden(False)
-            event.accept()
-    def configure_on_close(self,self_):
-        self._main_window = self_
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    chatwin = ChatWindow()
-    message_list = [
-    {"role": "assistant", "content": "Hello, I am a bot!"},
-    {"role": "user", "content": "Can you help me?"},
-    {"role": "assistant", "content": "Sure! What do you need help with?"}
-]
-    chatwin.load_messages(message_list)
-    chatwin.show()
+    window = ChatWindow()
+    window.show()
     sys.exit(app.exec())
